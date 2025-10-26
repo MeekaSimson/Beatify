@@ -1,0 +1,61 @@
+cat > .gitignore << 'EOF'
+# Python
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+*.so
+*.egg
+*.egg-info/
+
+# Virtual Environments
+**/venv/
+**/env/
+ml-service/venv/
+
+# Environment Variables
+.env
+.env.local
+**/.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Node.js (for frontend)
+**/node_modules/
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+coverage/
+.pytest_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+*.DS_Store
+
+# Large files
+ml-service/test-audio/*.wav
+ml-service/test-audio/*.mp3
+ml-service/test-audio/*.m4a
+ml-service/outputs/
+ml-service/samples/*.json
+
+# Backend (when you create it)
+backend/node_modules/
+backend/uploads/
+backend/*.log
+EOF

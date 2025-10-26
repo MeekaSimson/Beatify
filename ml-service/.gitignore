@@ -1,0 +1,32 @@
+cat > ml-service/.gitignore << 'EOF'
+# Virtual environment
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Test audio files (large)
+test-audio/*.wav
+test-audio/*.mp3
+test-audio/*.m4a
+test-audio/*.flac
+
+# Keep the folder but not files
+!test-audio/.gitkeep
+
+# Output files
+outputs/
+samples/*.json
+
+# Models (if you download any)
+models/
+*.pb
+*.h5
+*.onnx
+
+# Logs
+*.log
+EOF

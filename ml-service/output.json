@@ -1,0 +1,53 @@
+ Starting analysis of: test-audio/1.wav
+🎵 Analyzing pitch...
+Predicting MIDI for test-audio/1.wav...
+isfinite: True
+shape: (1, 43844, 1)
+dtype: float32
+isfinite: True
+shape: (1, 43844, 1)
+dtype: float32
+🎹 Detecting key...
+⏱️ Detecting tempo...
+✅ Analysis complete!
+s
+  "success": true,
+  "analysis": {
+    "notes": [
+      {
+        "pitch": 66,
+        "startTime": 1.37,
+        "endTime": 1.858,
+        "duration": 0.488,
+        "velocity": 0.67
+      },
+      {
+        "pitch": 64,
+        "startTime": 1.01,
+        "endTime": 1.347,
+        "duration": 0.337,
+        "velocity": 0.65
+      },
+      {
+        "pitch": 62,
+        "startTime": 0.615,
+        "endTime": 1.01,
+        "duration": 0.395,
+        "velocity": 0.65
+      },
+      {
+        "pitch": 74,
+        "startTime": 0.604,
+        "endTime": 0.813,
+        "duration": 0.209,
+        "velocity": 0.37
+      }
+    ],
+    "noteCount": 4,
+    "key": "D",
+    "scale": "major",
+    "keyConfidence": 0.76,
+    "bpm": 145.6,
+    "tempoConfidence": 0.0,
+    "duration": 1.98
+  }
