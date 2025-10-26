@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎵 Beatify Audio Analyzer - Test Page</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .container {
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 700px;
+      width: 100%;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    h1 {
+      text-align: center;
+      color: #667eea;
+      margin-bottom: 10px;
+      font-size: 2.5em;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 0.9em;
+    }
+
+    .upload-section {
+      background: #f8f9ff;
+      border: 3px dashed #667eea;
+      border-radius: 15px;
+      padding: 30px;
+      text-align: center;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .upload-section:hover {
+      background: #f0f2ff;
+      border-color: #764ba2;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .file-label {
+      display: inline-block;
+      padding: 15px 30px;
+      background: #667eea;
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1.1em;
+      transition: all 0.3s ease;
+    }
+
+    .file-label:hover {
+      background: #764ba2;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .file-name {
+      margin-top: 15px;
+      color: #667eea;
+      font-weight: bold;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.2em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 20px;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 30px;
+      background: #fff3cd;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      animation: pulse 1.5s infinite;
+    }
+
+    .loading.show {
+      display: block;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error {
+      display: none;
+      padding: 20px;
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .error.show {
+      display: block;
+    }
+
+    .results {
+      display: none;
+      background: #d4edda;
+      border: 1px solid #c3e6cb;
+      border-radius: 10px;
+      padding: 25px;
+      margin-top: 20px;
+    }
+
+    .results.show {
+      display: block;
+    }
+
+    .results h3 {
+      color: #155724;
+      margin-bottom: 20px;
+      font-size: 1.5em;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .result-card {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .result-card label {
+      display: block;
+      font-weight: bold;
+      color: #667eea;
+      margin-bottom: 5px;
+      font-size: 0.9em;
+    }
+
+    .result-card .value {
+      font-size: 1.3em;
+      color: #333;
+    }
+
+    .notes-section {
+      margin-top: 20px;
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+    }
+
+    .notes-section h4 {
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+
+    .note-item {
+      background: #f8f9ff;
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 5px;
+      font-size: 0.9em;
+      font-family: 'Courier New', monospace;
+    }
+
+    details {
+      margin-top: 15px;
+      background: white;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    summary {
+      cursor: pointer;
+      color: #667eea;
+      font-weight: bold;
+      padding: 10px;
+    }
+
+    summary:hover {
+      color: #764ba2;
+    }
+
+    pre {
+      background: #f8f9ff;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      font-size: 0.85em;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 0.8em;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+
+    .status-online {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .status-offline {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      color: #666;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎵 Beatify</h1>
+    <p class="subtitle">Audio Analysis Test Page <span id="status" class="status-badge status-offline">Checking...</span></p>
+
+    <!-- File Upload Section -->
+    <div class="upload-section">
+      <label for="audioFile" class="file-label">
+        📁 Choose Audio File
+      </label>
+      <input type="file" id="audioFile" accept="audio/*">
+      <div id="fileName" class="file-name"></div>
+    </div>
+
+    <!-- Analyze Button -->
+    <button id="analyzeBtn" disabled>🎵 Analyze Audio</button>
+
+    <!-- Loading State -->
+    <div id="loading" class="loading">
+      <div class="loading-spinner"></div>
+      <p><strong>⏳ Analyzing your audio...</strong></p>
+      <p>This may take 2-5 seconds depending on file size</p>
+    </div>
+
+    <!-- Error Display -->
+    <div id="error" class="error"></div>
+
+    <!-- Results Display -->
+    <div id="results" class="results">
+      <h3>✅ Analysis Complete!</h3>
+      
+      <div class="result-grid">
+        <div class="result-card">
+          <label>📄 File</label>
+          <div class="value" id="resultFilename">-</div>
+        </div>
+        <div class="result-card">
+          <label>⏱️ Duration</label>
+          <div class="value" id="resultDuration">-</div>
+        </div>
+        <div class="result-card">
+          <label>🥁 Tempo (BPM)</label>
+          <div class="value" id="resultBpm">-</div>
+        </div>
+        <div class="result-card">
+          <label>🎹 Key</label>
+          <div class="value" id="resultKey">-</div>
+        </div>
+        <div class="result-card">
+          <label>📊 Confidence</label>
+          <div class="value" id="resultConfidence">-</div>
+        </div>
+        <div class="result-card">
+          <label>🎼 Notes Detected</label>
+          <div class="value" id="resultNoteCount">-</div>
+        </div>
+      </div>
+
+      <!-- Notes List -->
+      <div class="notes-section" id="notesSection">
+        <h4>🎹 First 10 Detected Notes:</h4>
+        <div id="notesList"></div>
+      </div>
+
+      <!-- Raw JSON -->
+      <details>
+        <summary>📋 View Full JSON Response</summary>
+        <pre id="rawJson"></pre>
+      </details>
+    </div>
+
+    <div class="footer">
+      Made with ❤️ for Beatify Project
+    </div>
+  </div>
+
+  <script>
+    // Configuration
+    const API_BASE_URL = 'http://localhost:3001';
+
+    // DOM Elements
+    const fileInput = document.getElementById('audioFile');
+    const fileNameDisplay = document.getElementById('fileName');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const loadingDiv = document.getElementById('loading');
+    const errorDiv = document.getElementById('error');
+    const resultsDiv = document.getElementById('results');
+    const statusBadge = document.getElementById('status');
+
+    // Check if backend is online
+    async function checkBackendStatus() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/health`);
+        const data = await response.json();
+        
+        if (data.status === 'ok') {
+          statusBadge.textContent = 'Online ✓';
+          statusBadge.className = 'status-badge status-online';
+          return true;
+        }
+      } catch (error) {
+        statusBadge.textContent = 'Offline ✗';
+        statusBadge.className = 'status-badge status-offline';
+        showError('Backend server is not running. Please start it with: npm start');
+        return false;
+      }
+    }
+
+    // Check status on load
+    checkBackendStatus();
+
+    // File selection handler
+    fileInput.addEventListener('change', (event) => {
+      const file = event.target.files[0];
+      if (file) {
+        fileNameDisplay.textContent = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+        analyzeBtn.disabled = false;
+        hideError();
+        hideResults();
+      }
+    });
+
+    // Analyze button handler
+    analyzeBtn.addEventListener('click', analyzeAudio);
+
+    // Main analysis function
+    async function analyzeAudio() {
+      const file = fileInput.files[0];
+      
+      if (!file) {
+        showError('Please select an audio file first!');
+        return;
+      }
+
+      // Check backend is online
+      const isOnline = await checkBackendStatus();
+      if (!isOnline) {
+        return;
+      }
+
+      // Show loading state
+      loadingDiv.classList.add('show');
+      analyzeBtn.disabled = true;
+      hideError();
+      hideResults();
+
+      try {
+        // Create FormData
+        const formData = new FormData();
+        formData.append('audio', file);
+
+        // Make API call
+        console.log('🎵 Uploading and analyzing:', file.name);
+        const response = await fetch(`${API_BASE_URL}/api/analyze`, {
+          method: 'POST',
+          body: formData
+        });
+
+        // Parse response
+        const result = await response.json();
+        console.log('📊 Response:', result);
+
+        if (!response.ok || !result.success) {
+          throw new Error(result.error || 'Analysis failed');
+        }
+
+        // Display results
+        displayResults(result);
+        
+      } catch (error) {
+        console.error('❌ Error:', error);
+        showError(`Analysis failed: ${error.message}`);
+      } finally {
+        loadingDiv.classList.remove('show');
+        analyzeBtn.disabled = false;
+      }
+    }
+
+    // Display results
+    function displayResults(data) {
+      const analysis = data.analysis;
+
+      // Update result cards
+      document.getElementById('resultFilename').textContent = data.filename || 'Unknown';
+      document.getElementById('resultDuration').textContent = `${analysis.duration}s`;
+      document.getElementById('resultBpm').textContent = analysis.bpm;
+      document.getElementById('resultKey').textContent = `${analysis.key} ${analysis.scale}`;
+      document.getElementById('resultConfidence').textContent = `${(analysis.keyConfidence * 100).toFixed(0)}%`;
+      document.getElementById('resultNoteCount').textContent = analysis.noteCount;
+
+      // Display notes
+      const notesList = document.getElementById('notesList');
+      notesList.innerHTML = '';
+      
+      if (analysis.notes && analysis.notes.length > 0) {
+        const notesToShow = analysis.notes.slice(0, 10);
+        notesToShow.forEach((note, index) => {
+          const noteDiv = document.createElement('div');
+          noteDiv.className = 'note-item';
+          noteDiv.textContent = `${index + 1}. Pitch: ${note.pitch} | Start: ${note.startTime}s | Duration: ${note.duration}s | Velocity: ${note.velocity}`;
+          notesList.appendChild(noteDiv);
+        });
+
+        if (analysis.notes.length > 10) {
+          const moreDiv = document.createElement('div');
+          moreDiv.className = 'note-item';
+          moreDiv.style.fontStyle = 'italic';
+          moreDiv.textContent = `... and ${analysis.notes.length - 10} more notes`;
+          notesList.appendChild(moreDiv);
+        }
+      } else {
+        notesList.innerHTML = '<p style="color: #666;">No notes detected in this audio file.</p>';
+      }
+
+      // Display raw JSON
+      document.getElementById('rawJson').textContent = JSON.stringify(data, null, 2);
+
+      // Show results
+      resultsDiv.classList.add('show');
+    }
+
+    // Show error
+    function showError(message) {
+      errorDiv.textContent = `❌ ${message}`;
+      errorDiv.classList.add('show');
+    }
+
+    // Hide error
+    function hideError() {
+      errorDiv.classList.remove('show');
+    }
+
+    // Hide results
+    function hideResults() {
+      resultsDiv.classList.remove('show');
+    }
+  </script>
+</body>
+</html>

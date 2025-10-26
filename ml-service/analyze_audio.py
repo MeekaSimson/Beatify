@@ -4,17 +4,31 @@ import numpy as np
 from basic_pitch.inference import predict
 from basic_pitch import ICASSP_2022_MODEL_PATH
 import librosa
+import warnings
+import os
+
+# Suppress TensorFlow warnings
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
+# Suppress other warnings
+warnings.filterwarnings('ignore')
+
+# Import for capturing stdout
+import io
+import contextlib
 
 def analyze_pitch(audio_path):
     """Use Basic-Pitch to detect notes"""
     print("🎵 Analyzing pitch...", file=sys.stderr)
     
     try:
-        # Run Basic Pitch
-        model_output, midi_data, note_events = predict(
-            audio_path,
-            ICASSP_2022_MODEL_PATH
-        )
+        # CRITICAL: Capture Basic-Pitch's "Predicting MIDI..." output
+        with contextlib.redirect_stdout(io.StringIO()):
+            # Run Basic Pitch
+            model_output, midi_data, note_events = predict(
+                audio_path,
+                ICASSP_2022_MODEL_PATH
+            )
         
         # Convert to our format
         notes = []
@@ -51,8 +65,6 @@ def analyze_key_simple(notes):
         tonic = max(pitch_counts, key=pitch_counts.get)
         
         # Check for major vs minor
-        # Major has major third (4 semitones above tonic)
-        # Minor has minor third (3 semitones above tonic)
         major_third = (tonic + 4) % 12
         minor_third = (tonic + 3) % 12
         
@@ -60,7 +72,7 @@ def analyze_key_simple(notes):
         
         key_names = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B']
         
-        # Calculate confidence based on how clear the key is
+        # Calculate confidence
         total = sum(pitch_counts.values())
         tonic_percentage = pitch_counts[tonic] / total if total > 0 else 0
         confidence = round(min(tonic_percentage * 2, 0.95), 2)
@@ -80,15 +92,14 @@ def analyze_tempo(audio_path):
     print("⏱️ Detecting tempo...", file=sys.stderr)
     
     try:
-        # Load audio
-        y, sr = librosa.load(audio_path)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            y, sr = librosa.load(audio_path)
+            tempo, beats = librosa.beat.beat_track(y=y, sr=sr)
         
-        # Detect tempo
-        tempo, beats = librosa.beat.beat_track(y=y, sr=sr)
-        
-        # Properly handle numpy types
+        # Handle numpy types
         if hasattr(tempo, 'item'):
-            bpm = tempo.item()  # Extract from numpy array
+            bpm = tempo.item()
         elif isinstance(tempo, (list, tuple)):
             bpm = float(tempo[0])
         else:
@@ -106,8 +117,10 @@ def analyze_tempo(audio_path):
 def get_audio_duration(audio_path):
     """Get audio duration"""
     try:
-        y, sr = librosa.load(audio_path)
-        duration = librosa.get_duration(y=y, sr=sr)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            y, sr = librosa.load(audio_path)
+            duration = librosa.get_duration(y=y, sr=sr)
         return round(float(duration), 2)
     except Exception as e:
         print(f"❌ Duration error: {e}", file=sys.stderr)
@@ -153,6 +166,7 @@ if __name__ == '__main__':
     
     try:
         result = analyze_audio(audio_file)
+        # CRITICAL: Print ONLY JSON to stdout
         print(json.dumps(result, indent=2))
     except Exception as e:
         print(json.dumps({
