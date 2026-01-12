@@ -1,16 +1,4 @@
- Starting analysis of: test-audio/1.wav
-🎵 Analyzing pitch...
-Predicting MIDI for test-audio/1.wav...
-isfinite: True
-shape: (1, 43844, 1)
-dtype: float32
-isfinite: True
-shape: (1, 43844, 1)
-dtype: float32
-🎹 Detecting key...
-⏱️ Detecting tempo...
-✅ Analysis complete!
-s
+{
   "success": true,
   "analysis": {
     "notes": [
@@ -51,3 +39,4 @@ s
     "tempoConfidence": 0.0,
     "duration": 1.98
   }
+}
