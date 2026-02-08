@@ -1,0 +1,343 @@
+{
+  "success": true,
+  "analysis": {
+    "notes": [
+      {
+        "pitch": 46,
+        "startTime": 13.684,
+        "endTime": 13.941,
+        "duration": 0.257,
+        "velocity": 0.46
+      },
+      {
+        "pitch": 46,
+        "startTime": 13.255,
+        "endTime": 13.533,
+        "duration": 0.279,
+        "velocity": 0.35
+      },
+      {
+        "pitch": 58,
+        "startTime": 13.243,
+        "endTime": 13.696,
+        "duration": 0.453,
+        "velocity": 0.46
+      },
+      {
+        "pitch": 46,
+        "startTime": 12.848,
+        "endTime": 13.069,
+        "duration": 0.221,
+        "velocity": 0.28
+      },
+      {
+        "pitch": 58,
+        "startTime": 12.837,
+        "endTime": 13.243,
+        "duration": 0.406,
+        "velocity": 0.58
+      },
+      {
+        "pitch": 62,
+        "startTime": 11.431,
+        "endTime": 12.082,
+        "duration": 0.651,
+        "velocity": 0.7
+      },
+      {
+        "pitch": 62,
+        "startTime": 11.245,
+        "endTime": 11.431,
+        "duration": 0.186,
+        "velocity": 0.38
+      },
+      {
+        "pitch": 63,
+        "startTime": 10.571,
+        "endTime": 11.21,
+        "duration": 0.639,
+        "velocity": 0.74
+      },
+      {
+        "pitch": 65,
+        "startTime": 9.653,
+        "endTime": 10.049,
+        "duration": 0.396,
+        "velocity": 0.67
+      },
+      {
+        "pitch": 46,
+        "startTime": 9.653,
+        "endTime": 9.792,
+        "duration": 0.139,
+        "velocity": 0.27
+      },
+      {
+        "pitch": 65,
+        "startTime": 9.502,
+        "endTime": 9.653,
+        "duration": 0.151,
+        "velocity": 0.23
+      },
+      {
+        "pitch": 67,
+        "startTime": 9.235,
+        "endTime": 9.583,
+        "duration": 0.348,
+        "velocity": 0.7
+      },
+      {
+        "pitch": 67,
+        "startTime": 8.852,
+        "endTime": 9.235,
+        "duration": 0.383,
+        "velocity": 0.8
+      },
+      {
+        "pitch": 69,
+        "startTime": 8.109,
+        "endTime": 8.805,
+        "duration": 0.697,
+        "velocity": 0.71
+      },
+      {
+        "pitch": 69,
+        "startTime": 7.97,
+        "endTime": 8.109,
+        "duration": 0.139,
+        "velocity": 0.65
+      },
+      {
+        "pitch": 70,
+        "startTime": 7.759,
+        "endTime": 7.97,
+        "duration": 0.21,
+        "velocity": 0.77
+      },
+      {
+        "pitch": 70,
+        "startTime": 7.492,
+        "endTime": 7.759,
+        "duration": 0.267,
+        "velocity": 0.58
+      },
+      {
+        "pitch": 62,
+        "startTime": 6.784,
+        "endTime": 6.958,
+        "duration": 0.174,
+        "velocity": 0.35
+      },
+      {
+        "pitch": 70,
+        "startTime": 6.424,
+        "endTime": 6.784,
+        "duration": 0.36,
+        "velocity": 0.74
+      },
+      {
+        "pitch": 62,
+        "startTime": 5.958,
+        "endTime": 6.192,
+        "duration": 0.233,
+        "velocity": 0.33
+      },
+      {
+        "pitch": 69,
+        "startTime": 5.842,
+        "endTime": 6.331,
+        "duration": 0.489,
+        "velocity": 0.68
+      },
+      {
+        "pitch": 69,
+        "startTime": 5.633,
+        "endTime": 5.842,
+        "duration": 0.209,
+        "velocity": 0.76
+      },
+      {
+        "pitch": 67,
+        "startTime": 4.797,
+        "endTime": 5.668,
+        "duration": 0.871,
+        "velocity": 0.75
+      },
+      {
+        "pitch": 65,
+        "startTime": 4.159,
+        "endTime": 4.728,
+        "duration": 0.569,
+        "velocity": 0.73
+      },
+      {
+        "pitch": 64,
+        "startTime": 3.972,
+        "endTime": 4.159,
+        "duration": 0.187,
+        "velocity": 0.53
+      },
+      {
+        "pitch": 63,
+        "startTime": 3.148,
+        "endTime": 3.519,
+        "duration": 0.372,
+        "velocity": 0.67
+      },
+      {
+        "pitch": 62,
+        "startTime": 2.497,
+        "endTime": 3.148,
+        "duration": 0.65,
+        "velocity": 0.73
+      },
+      {
+        "pitch": 60,
+        "startTime": 1.533,
+        "endTime": 2.3,
+        "duration": 0.768,
+        "velocity": 0.53
+      },
+      {
+        "pitch": 58,
+        "startTime": 1.3,
+        "endTime": 1.637,
+        "duration": 0.337,
+        "velocity": 0.61
+      },
+      {
+        "pitch": 58,
+        "startTime": 1.115,
+        "endTime": 1.3,
+        "duration": 0.186,
+        "velocity": 0.75
+      },
+      {
+        "pitch": 58,
+        "startTime": 0.789,
+        "endTime": 1.115,
+        "duration": 0.325,
+        "velocity": 0.74
+      },
+      {
+        "pitch": 46,
+        "startTime": 0.325,
+        "endTime": 0.534,
+        "duration": 0.209,
+        "velocity": 0.33
+      },
+      {
+        "pitch": 60,
+        "startTime": 12.105,
+        "endTime": 12.523,
+        "duration": 0.418,
+        "velocity": 0.46
+      },
+      {
+        "pitch": 62,
+        "startTime": 2.346,
+        "endTime": 2.486,
+        "duration": 0.139,
+        "velocity": 0.53
+      },
+      {
+        "pitch": 62,
+        "startTime": 13.777,
+        "endTime": 13.906,
+        "duration": 0.129,
+        "velocity": 0.38
+      },
+      {
+        "pitch": 70,
+        "startTime": 3.02,
+        "endTime": 3.24,
+        "duration": 0.221,
+        "velocity": 0.29
+      }
+    ],
+    "noteCount": 36,
+    "key": "A#",
+    "scale": "major",
+    "keyConfidence": 0.93,
+    "bpm": 73.8,
+    "tempoConfidence": 0.85,
+    "duration": 14.12,
+    "chords": [
+      {
+        "name": "G#",
+        "root": 80,
+        "midi_notes": [
+          68,
+          72,
+          75
+        ],
+        "start_time": 0.325,
+        "duration": 1.975,
+        "confidence": 0.5
+      },
+      {
+        "name": "G#",
+        "root": 80,
+        "midi_notes": [
+          68,
+          72,
+          75
+        ],
+        "start_time": 2.346,
+        "duration": 2.382,
+        "confidence": 0.6
+      },
+      {
+        "name": "G#",
+        "root": 80,
+        "midi_notes": [
+          68,
+          72,
+          75
+        ],
+        "start_time": 4.797,
+        "duration": 2.161,
+        "confidence": 0.5
+      },
+      {
+        "name": "C#",
+        "root": 73,
+        "midi_notes": [
+          61,
+          65,
+          68
+        ],
+        "start_time": 7.492,
+        "duration": 2.091,
+        "confidence": 0.667
+      },
+      {
+        "name": "G#",
+        "root": 80,
+        "midi_notes": [
+          68,
+          72,
+          75
+        ],
+        "start_time": 9.502,
+        "duration": 2.58,
+        "confidence": 0.75
+      },
+      {
+        "name": "G#",
+        "root": 80,
+        "midi_notes": [
+          68,
+          72,
+          75
+        ],
+        "start_time": 12.105,
+        "duration": 1.801,
+        "confidence": 0.667
+      }
+    ],
+    "chordCount": 6,
+    "segmentDuration": 2.0,
+    "chordGenerationMethod": "rule-based"
+  }
+}

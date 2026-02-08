@@ -5,14 +5,20 @@ import { repository } from "@/lib/repository"
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
-    const file = formData.get("file") as File
+    const file = formData.get("audio") as File
 
     if (!file) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 })
     }
 
     // Validate file type
-    const allowedTypes = ["audio/wav", "audio/mpeg", "audio/mp4", "audio/webm"]
+const allowedTypes = [
+  "audio/wav",
+  "audio/mpeg",
+  "audio/mp3",
+  "audio/mp4",
+  "audio/webm"
+]
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json({ error: "Invalid file type. Please upload WAV, MP3, or M4A files." }, { status: 400 })
     }

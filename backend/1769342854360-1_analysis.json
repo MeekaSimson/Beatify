@@ -1,0 +1,59 @@
+{
+  "success": true,
+  "analysis": {
+    "notes": [
+      {
+        "pitch": 66,
+        "startTime": 1.37,
+        "endTime": 1.858,
+        "duration": 0.488,
+        "velocity": 0.67
+      },
+      {
+        "pitch": 64,
+        "startTime": 1.01,
+        "endTime": 1.347,
+        "duration": 0.337,
+        "velocity": 0.65
+      },
+      {
+        "pitch": 62,
+        "startTime": 0.615,
+        "endTime": 1.01,
+        "duration": 0.395,
+        "velocity": 0.65
+      },
+      {
+        "pitch": 74,
+        "startTime": 0.604,
+        "endTime": 0.813,
+        "duration": 0.209,
+        "velocity": 0.37
+      }
+    ],
+    "noteCount": 4,
+    "key": "D",
+    "scale": "major",
+    "keyConfidence": 0.82,
+    "bpm": 152.0,
+    "tempoConfidence": 0.85,
+    "duration": 1.98,
+    "chords": [
+      {
+        "name": "Em",
+        "root": 64,
+        "midi_notes": [
+          64,
+          67,
+          71
+        ],
+        "start_time": 0.604,
+        "duration": 1.254,
+        "confidence": 0.333
+      }
+    ],
+    "chordCount": 1,
+    "segmentDuration": 2.0,
+    "chordGenerationMethod": "rule-based"
+  }
+}

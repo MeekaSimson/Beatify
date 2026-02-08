@@ -4,15 +4,21 @@ const multer = require('multer');
 const { spawn } = require('child_process');
 const path = require('path');
 const fs = require('fs');
+const db = require('./src/db/database');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(
+  "/uploads",
+  express.static(path.join(__dirname, "uploads"))
+);
 
-// Configure multer for file uploads
+
+// -------------------- MULTER SETUP --------------------
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadDir = path.join(__dirname, 'uploads');
@@ -22,156 +28,273 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    const uniqueName = `${Date.now()}-${file.originalname}`;
-    cb(null, uniqueName);
+    cb(null, `${Date.now()}-${file.originalname}`);
   }
 });
 
 const upload = multer({
-  storage: storage,
+  storage,
+  limits: { fileSize: 50 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    // Accept audio files
-    const allowedTypes = ['audio/mpeg', 'audio/wav', 'audio/mp3', 'audio/ogg', 'audio/flac'];
-    if (allowedTypes.includes(file.mimetype) || file.originalname.match(/\.(mp3|wav|ogg|flac)$/)) {
-      cb(null, true);
-    } else {
-      cb(new Error('Invalid file type. Only audio files are allowed.'));
-    }
-  },
-  limits: {
-    fileSize: 50 * 1024 * 1024 // 50MB max file size
+  const allowedMimeTypes = [
+  "audio/wav",
+  "audio/x-wav",
+
+  "audio/mpeg",
+  "audio/mp3",
+
+  "audio/mp4",
+  "audio/x-m4a",   // ← THIS IS THE ONE BREAKING YOU
+  "audio/m4a",
+
+  "audio/webm",
+  "audio/ogg",
+]
+
+  const allowedExtensions = /\.(wav|mp3|ogg|flac|webm)$/i
+
+  const mimeOk = allowedMimeTypes.includes(file.mimetype)
+  const extOk = allowedExtensions.test(file.originalname)
+
+  if (mimeOk || extOk) {
+    cb(null, true)
+  } else {
+    console.error("Rejected file:", file.mimetype, file.originalname)
+    cb(new Error("Invalid audio format"))
   }
+}
+
 });
 
-// Health check endpoint
+// -------------------- HEALTH --------------------
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Beatify Backend API is running!' });
+  res.json({ status: 'ok' });
 });
 
-// Main analysis endpoint
-app.post('/api/analyze', upload.single('audio'), async (req, res) => {
+// -------------------- UPLOAD --------------------
+app.post("/api/audio/upload", upload.single("audio"), (req, res) => {
   if (!req.file) {
-    return res.status(400).json({ error: 'No audio file uploaded' });
+    return res.status(400).json({ error: "No file received" })
   }
 
-  const audioFilePath = req.file.path;
-  console.log(`Processing file: ${audioFilePath}`);
+  res.json({
+    trackId: Date.now().toString(),
+    originalFilename: req.file.originalname,
+    durationSec: 0
+  })
+})
 
-  try {
-    // Path to your Python script
-    const pythonScriptPath = path.join(__dirname, '../ml-service/analyze_audio.py');
-    
-    // Spawn Python process
-    const pythonProcess = spawn('python3', [pythonScriptPath, audioFilePath]);
 
-    let outputData = '';
-    let errorData = '';
+// -------------------- ANALYZE --------------------
+app.post('/api/audio/analyze', (req, res) => {
+  const { filePath } = req.body;
 
-    // Collect stdout data (JSON output)
-    pythonProcess.stdout.on('data', (data) => {
-      const chunk = data.toString();
-      outputData += chunk;
-      console.log('Python stdout:', chunk.substring(0, 100)); // Debug: first 100 chars
+  if (!filePath) {
+    return res.status(400).json({
+      success: false,
+      error: 'filePath is required'
     });
+  }
 
-    // Collect stderr data (logs)
-    pythonProcess.stderr.on('data', (data) => {
-      errorData += data.toString();
-      // Don't log every stderr line, only errors
-      const line = data.toString().trim();
-      if (line.includes('❌') || line.includes('Error')) {
-        console.error(`Python Error: ${line}`);
+  console.log('Analyzing audio file:', filePath);
+
+  const pythonScriptPath = path.join(
+    __dirname,
+    '../ml-service/analyze_with_chords.py'
+  );
+
+  const pythonProcess = spawn('python3', [
+    pythonScriptPath,
+    filePath
+  ]);
+   pythonProcess.stdout.on('data', (data) => {
+      process.stdout.write(data.toString());
+    });
+  let errorData = '';
+
+  pythonProcess.stderr.on('data', (data) => {
+    errorData += data.toString();
+  });
+
+  pythonProcess.on('close', (code) => {
+    if (code !== 0) {
+      console.error('Python error:', errorData);
+
+      if (errorData.includes("KeyError: 'Unknown'")) {
+        return res.status(400).json({
+          success: false,
+          error: 'Could not detect musical key',
+          message: 'Please try a clearer melody or different audio input.'
+        });
       }
-    });
 
-    // Handle process completion
-    pythonProcess.on('close', (code) => {
-      // Clean up uploaded file
-      fs.unlink(audioFilePath, (err) => {
-        if (err) console.error('Error deleting file:', err);
+      return res.status(500).json({
+        success: false,
+        error: 'Python analysis failed'
       });
+    }
 
-      if (code !== 0) {
-        console.error(`Python script exited with code ${code}`);
+    // ✅ READ JSON FILE GENERATED BY PYTHON
+    const analysisFilePath = path.join(
+  __dirname,
+  path.basename(filePath).replace(
+    /\.(wav|mp3|ogg|flac)$/i,
+    '_analysis.json'
+  )
+);
+
+
+    console.log('✅ USING FILE-BASED ANALYSIS PATH');
+   
+
+
+    if (!fs.existsSync(analysisFilePath)) {
+      return res.status(500).json({
+        success: false,
+        error: 'Analysis file not generated by Python'
+      });
+    }
+
+    try {
+      const fileContents = fs.readFileSync(analysisFilePath, 'utf-8');
+      const analysisJson = JSON.parse(fileContents);
+        db.run(
+        `
+        INSERT INTO analyses (original_filename, file_path, analysis_json)
+        VALUES (?, ?, ?)
+        `,
+        [
+          path.basename(filePath),
+          filePath,
+          JSON.stringify(analysisJson)
+        ],
+        function (err) {
+          if (err) {
+            console.error('❌ Failed to save analysis:', err.message);
+          } else {
+            console.log('✅ Analysis saved to DB with ID:', this.lastID);
+          }
+        }
+    );
+
+      return res.json(analysisJson);
+
+
+
+    } catch (err) {
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to read analysis JSON'
+      });
+    }
+  });
+});
+// -------------------- HISTORY --------------------
+
+app.get('/api/audio/history', (req, res) => {
+  db.all(
+    `
+    SELECT id, original_filename, created_at
+    FROM analyses
+    ORDER BY created_at DESC
+    `,
+    [],
+    (err, rows) => {
+      if (err) {
+        console.error('❌ Failed to fetch history:', err.message);
         return res.status(500).json({
           success: false,
-          error: 'Analysis failed',
-          details: errorData || 'Unknown error occurred'
+          error: 'Failed to fetch analysis history'
+        });
+      }
+
+      res.json({
+        success: true,
+        history: rows
+      });
+    }
+  );
+});
+// -------------------- HIST/ANALYSIS --------------------
+
+app.get('/api/audio/analysis/:id', (req, res) => {
+  const { id } = req.params;
+
+  db.get(
+    `
+    SELECT analysis_json
+    FROM analyses
+    WHERE id = ?
+    `,
+    [id],
+    (err, row) => {
+      if (err) {
+        console.error('❌ DB error:', err.message);
+        return res.status(500).json({
+          success: false,
+          error: 'Database error'
+        });
+      }
+
+      if (!row) {
+        return res.status(404).json({
+          success: false,
+          error: 'Analysis not found'
         });
       }
 
       try {
-        // Clean the output - remove any non-JSON text before parsing
-        let jsonOutput = outputData.trim();
-        
-        // If there's any text before the first '{', remove it
-        const jsonStart = jsonOutput.indexOf('{');
-        if (jsonStart > 0) {
-          console.log('Warning: Non-JSON text detected, cleaning...');
-          jsonOutput = jsonOutput.substring(jsonStart);
-        }
-        
-        // Parse the JSON output from Python script
-        const result = JSON.parse(jsonOutput);
-        
-        console.log('✅ Analysis successful:', result.success ? 'true' : 'false');
-        console.log('   Notes detected:', result.analysis?.noteCount || 0);
-        console.log('   Tempo:', result.analysis?.bpm || 'unknown');
-        
-        // Return the result exactly as Python returns it
+        const analysis = JSON.parse(row.analysis_json);
+
         res.json({
-          ...result,
-          filename: req.file.originalname
+          success: true,
+          analysis
         });
-      } catch (parseError) {
-        console.error('❌ Error parsing Python output:', parseError.message);
-        console.error('Raw output length:', outputData.length);
-        console.error('First 200 chars:', outputData.substring(0, 200));
-        console.error('Last 200 chars:', outputData.substring(Math.max(0, outputData.length - 200)));
-        
+      } catch (parseErr) {
+        console.error('❌ JSON parse error:', parseErr.message);
         res.status(500).json({
           success: false,
-          error: 'Failed to parse analysis results',
-          details: parseError.message,
-          rawOutputPreview: outputData.substring(0, 300)
+          error: 'Corrupted analysis data'
         });
       }
-    });
-
-  } catch (error) {
-    console.error('Error processing file:', error);
-    
-    // Clean up file on error
-    fs.unlink(audioFilePath, (err) => {
-      if (err) console.error('Error deleting file:', err);
-    });
-
-    res.status(500).json({
-      error: 'Server error during analysis',
-      details: error.message
-    });
-  }
+    }
+  );
 });
+// -------------------- DELETE --------------------
+app.delete('/api/audio/analysis/:id', (req, res) => {
+  const { id } = req.params;
 
-// Error handling middleware
-app.use((error, req, res, next) => {
-  if (error instanceof multer.MulterError) {
-    if (error.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({
-        error: 'File too large',
-        details: 'Maximum file size is 50MB'
+  db.run(
+    `
+    DELETE FROM analyses
+    WHERE id = ?
+    `,
+    [id],
+    function (err) {
+      if (err) {
+        console.error('❌ Failed to delete analysis:', err.message);
+        return res.status(500).json({
+          success: false,
+          error: 'Failed to delete analysis'
+        });
+      }
+
+      if (this.changes === 0) {
+        return res.status(404).json({
+          success: false,
+          error: 'Analysis not found'
+        });
+      }
+
+      res.json({
+        success: true,
+        deletedId: id
       });
     }
-  }
-  
-  res.status(500).json({
-    error: error.message || 'Internal server error'
-  });
+  );
 });
 
-// Start server
+// -------------------- START SERVER --------------------
 app.listen(PORT, () => {
   console.log(`🚀 Beatify Backend API running on http://localhost:${PORT}`);
-  console.log(`📁 Upload endpoint: http://localhost:${PORT}/api/analyze`);
-  console.log(`💚 Health check: http://localhost:${PORT}/health`);
 });

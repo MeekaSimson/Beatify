@@ -1,0 +1,78 @@
+{
+  "success": true,
+  "analysis": {
+    "notes": [
+      {
+        "pitch": 64,
+        "startTime": 2.312,
+        "endTime": 2.463,
+        "duration": 0.151,
+        "velocity": 0.57
+      },
+      {
+        "pitch": 64,
+        "startTime": 1.753,
+        "endTime": 2.312,
+        "duration": 0.559,
+        "velocity": 0.7
+      },
+      {
+        "pitch": 62,
+        "startTime": 1.277,
+        "endTime": 1.718,
+        "duration": 0.441,
+        "velocity": 0.63
+      },
+      {
+        "pitch": 72,
+        "startTime": 0.789,
+        "endTime": 1.057,
+        "duration": 0.267,
+        "velocity": 0.38
+      },
+      {
+        "pitch": 60,
+        "startTime": 0.789,
+        "endTime": 1.289,
+        "duration": 0.499,
+        "velocity": 0.65
+      }
+    ],
+    "noteCount": 5,
+    "key": "C",
+    "scale": "major",
+    "keyConfidence": 0.78,
+    "bpm": 123.0,
+    "tempoConfidence": 0.85,
+    "duration": 2.49,
+    "chords": [
+      {
+        "name": "C",
+        "root": 60,
+        "midi_notes": [
+          60,
+          64,
+          67
+        ],
+        "start_time": 0.789,
+        "duration": 1.523,
+        "confidence": 0.667
+      },
+      {
+        "name": "C",
+        "root": 60,
+        "midi_notes": [
+          60,
+          64,
+          67
+        ],
+        "start_time": 2.312,
+        "duration": 0.151,
+        "confidence": 1.0
+      }
+    ],
+    "chordCount": 2,
+    "segmentDuration": 2.0,
+    "chordGenerationMethod": "rule-based"
+  }
+}
