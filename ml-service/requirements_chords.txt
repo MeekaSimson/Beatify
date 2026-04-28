@@ -1,0 +1,17 @@
+# Chord Generation Module Requirements
+# Install with: pip install -r requirements_chords.txt
+
+# Core dependencies (minimal - no heavy ML libs needed)
+# These should already be installed from your main requirements.txt
+
+# For testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# Already in your main requirements.txt:
+# numpy>=1.24.3
+# (used for array operations)
+
+# Optional: For advanced music theory operations (future enhancement)
+# music21>=9.1.0
+# mingus>=0.6.1

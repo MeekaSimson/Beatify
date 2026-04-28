@@ -1,0 +1,8 @@
+{
+  "test_samples": 480,
+  "test_bars": 7680,
+  "ml_accuracy_pct": 100.0,
+  "rule_based_accuracy_pct": 100.0,
+  "ml_correct_bars": 7680,
+  "rule_correct_bars": 7680
+}
