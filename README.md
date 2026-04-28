@@ -1,362 +1,329 @@
-🎵 Beatify - AI Melody-to-Chord Harmonizer
-Transform your voice into a complete song with AI-powered musical analysis.
-Show Image
-Show Image
-Show Image
-Show Image
+# Beatify — Voice to Song Generator
 
-🎯 Overview
-Beatify is an AI-powered web application that analyzes your sung melody and automatically generates:
+Beatify takes a voice recording as input and produces a complete song — your voice as the melody, accompanied by generated chords, bass, and drums.
 
-🎹 Matching chord progressions based on music theory
-🎸 Instrumental accompaniment (bass, drums, guitar, piano)
-📊 Musical insights (key, scale, tempo, BPM)
-🎨 Visual piano roll displaying detected notes
+---
 
-Perfect for songwriters, music students, and content creators who want to turn melodic ideas into full songs.
+## How It Works
 
-✨ Features
-Current Features (v0.1)
+```
+Voice Input (.mp3 / .wav / .m4a)
+        │
+        ▼
+  Audio Analysis
+  ├── Pitch detection     (Basic-Pitch by Spotify)
+  ├── Key & scale         (Krumhansl-Schmuckler algorithm)
+  └── Tempo / BPM         (Librosa beat tracking)
+        │
+        ▼
+  Chord Generation        (Rule-based, bar-aligned)
+  ├── Diatonic chord fitting per bar
+  ├── Bass line generation
+  └── Drum pattern generation
+        │
+        ▼
+  MIDI Export             (pretty_midi)
+  ├── Chords track
+  ├── Bass track
+  └── Drums track
+        │
+        ▼
+  Audio Mix               (librosa + soundfile)
+  └── Voice + Backing → Final Song (.wav)
+```
 
-✅ Voice Recording & Upload - Record directly or upload MP3/WAV/M4A files
-✅ AI Pitch Detection - Powered by Spotify's Basic-Pitch (92% accuracy)
-✅ Musical Key Detection - Automatically identifies key and scale
-✅ Tempo Detection - Accurate BPM detection using Librosa
-✅ Piano Roll Visualization - See your melody as musical notes
-✅ JSON API Output - Ready for backend integration
+---
 
-Coming Soon
+## Project Structure
 
-🔄 Chord progression generation (rule-based + AI)
-🔄 Instrumental track synthesis
-🔄 Real-time mixing console
-🔄 Multiple arrangement styles (pop, rock, jazz, etc.)
-🔄 Export final mixed tracks
+```
+Beatify/
+├── ml-service/                  # Core Python pipeline
+│   ├── analyze_audio.py         # Pitch, key, tempo detection
+│   ├── chord_generator.py       # Rule-based chord generation
+│   ├── bass_generator.py        # Bass line from chord progression
+│   ├── drum_generator.py        # Drum pattern generation
+│   ├── midi_exporter.py         # Multi-track MIDI export
+│   ├── melody_quantizer.py      # Quantize detected notes to grid
+│   ├── audio_renderer.py        # Render MIDI to audio + mix with voice
+│   ├── analyze_with_chords.py   # Main pipeline entry point
+│   ├── smart_analysis.py        # Key validation with chord scoring
+│   ├── demo.py                  # Demo runner
+│   ├── ml_model/
+│   │   ├── model.py             # Bi-GRU + Attention chord model
+│   │   ├── train.py             # Model training script
+│   │   ├── inference.py         # ML-based chord inference
+│   │   ├── dataset.py           # Dataset loader
+│   │   └── evaluate.py          # Model evaluation
+│   └── requirements.txt
+├── FrontEnd/                    # Next.js 14 web app
+├── backend/                     # Node.js + Express API
+└── README.md
+```
 
+---
 
-🏗️ Architecture
-┌─────────────────────────────────────────┐
-│  FRONTEND (Next.js 14 + TypeScript)     │
-│  - Audio recording/upload interface     │
-│  - Piano roll visualization             │
-│  - Mix console UI                       │
-│  - Track library                        │
-└──────────────┬──────────────────────────┘
-               │
-               │ REST API
-               ▼
-┌─────────────────────────────────────────┐
-│  BACKEND (Node.js + Express)            │
-│  - File upload handling                 │
-│  - API orchestration                    │
-│  - User management                      │
-│  - Database operations                  │
-└──────────────┬──────────────────────────┘
-               │
-               │ Python subprocess
-               ▼
-┌─────────────────────────────────────────┐
-│  ML SERVICE (Python 3.11)               │
-│  - Basic-Pitch: Pitch detection         │
-│  - Librosa: Tempo analysis              │
-│  - Custom: Key detection                │
-│  - Returns: JSON analysis               │
-└─────────────────────────────────────────┘
+## Setup
 
-🚀 Quick Start
-Prerequisites
+### Prerequisites
 
-Python 3.11+ (for ML service)
-Node.js 18+ (for frontend/backend)
-Homebrew (macOS) or package manager
+- Python 3.11+
+- Node.js 18+
+- Homebrew (macOS)
 
-1. Clone Repository
-bashgit clone https://github.com/MeekaSimson/Beatify.git
-cd Beatify
-2. Setup ML Service
-bashcd ml-service
+---
 
-# Create virtual environment
+### 1. ML Service
+
+```bash
+cd ml-service
+
+# Create and activate virtual environment
 python3.11 -m venv venv
-
-# Activate virtual environment
-source venv/bin/activate  # Mac/Linux
-# OR
-venv\Scripts\activate  # Windows
+source venv/bin/activate        # Mac/Linux
+# venv\Scripts\activate         # Windows
 
 # Install dependencies
 pip install -r requirements.txt
+pip install pretty_midi
+```
 
-# Test the service
-python analyze_audio_simple.py test-audio/sample.mp3
-3. Setup Frontend
-bashcd ../frontend
+`requirements.txt` includes:
+```
+numpy==1.24.3
+scipy==1.11.4
+scikit-learn==1.3.2
+tensorflow==2.13.1
+librosa==0.10.1
+soundfile==0.12.1
+basic-pitch==0.3.3
+```
 
-# Install dependencies
+---
+
+### 2. Audio Rendering (optional — needed for final song WAV output)
+
+```bash
+# Install fluidsynth
+brew install fluid-synth
+
+# Download GeneralUser GS soundfont (~30MB) from:
+# https://schristiancollins.com/generaluser.php
+# Place the .sf2 file in ml-service/ as GeneralUser.sf2
+```
+
+---
+
+### 3. Frontend
+
+```bash
+cd FrontEnd
 npm install
-
-# Run development server
 npm run dev
-Visit http://localhost:3000 to see the app! 🎉
+```
 
-📁 Project Structure
-Beatify/
-│
-├── frontend/                    # Next.js web application
-│   ├── src/
-│   │   ├── app/                # App router pages
-│   │   ├── components/         # React components
-│   │   └── lib/                # Utilities & API client
-│   ├── public/                 # Static assets
-│   └── package.json
-│
-├── ml-service/                  # Python AI service
-│   ├── analyze_audio_simple.py # Main analysis script
-│   ├── requirements.txt        # Python dependencies
-│   ├── test-audio/             # Sample audio files
-│   └── README.md               # ML service docs
-│
-├── backend/                     # Node.js API (Coming Soon)
-│   └── (In development)
-│
-├── docs/                        # Documentation
-│   ├── API.md
-│   └── SETUP.md
-│
-└── README.md                    # This file
+Visit `http://localhost:3000`
 
-🛠️ Technology Stack
-Frontend
+---
 
-Framework: Next.js 14 (React 18)
-Language: TypeScript
-Styling: Tailwind CSS
-UI Components: shadcn/ui
-Audio: Web Audio API, WaveSurfer.js
-State: Zustand
+### 4. Backend
 
-ML Service
+```bash
+cd backend
+npm install
+node server.js
+```
 
-Runtime: Python 3.11
-AI Models:
+Runs on `http://localhost:5000`
 
-Basic-Pitch (Spotify) - Pitch detection
-Librosa - Tempo/audio analysis
+---
 
+## Running the Pipeline
 
-Output: JSON format
+### Basic analysis — key, BPM, chords, MIDI export
 
-Backend (Coming Soon)
+```bash
+cd ml-service
+source venv/bin/activate
+python analyze_with_chords.py <audio_file>
+```
 
-Runtime: Node.js 18+
-Framework: Express.js
-Database: SQLite (dev), PostgreSQL (prod)
-File Storage: Local (dev), Cloudinary (prod)
+Outputs:
+- `<name>_analysis.json` — detected key, BPM, notes, chord progression
+- `<name>_arrangement.mid` — backing MIDI (chords + bass + drums)
 
+---
 
-📊 ML Service Output Format
-json{
+### With known key (recommended)
+
+When a melody uses only a few notes, auto key detection can be uncertain. Use `--force-key` to supply the key directly:
+
+```bash
+python analyze_with_chords.py song.mp3 A minor --force-key
+python analyze_with_chords.py song.mp3 G major --force-key
+```
+
+---
+
+### Full song output — voice + backing mixed
+
+```bash
+python analyze_with_chords.py song.mp3 G major --force-key --mix
+```
+
+Outputs:
+- `<name>_backing.wav` — rendered backing track audio
+- `<name>_song.wav` — your voice mixed with the full arrangement
+
+---
+
+### Soft instrument preset
+
+```bash
+python analyze_with_chords.py song.mp3 --soft --mix
+```
+
+| Track   | Standard           | Soft                      |
+|---------|--------------------|---------------------------|
+| Chords  | Grand Piano        | String Ensemble           |
+| Bass    | Electric Bass      | Acoustic Bass             |
+| Drums   | Hi-hat + Snare     | Ride cymbal + Side stick  |
+
+---
+
+### ML chord generation (experimental)
+
+```bash
+python analyze_with_chords.py song.mp3 --ml
+```
+
+Uses the trained Bi-GRU model (`ml_model/chord_model.pth`) instead of the rule-based generator.
+
+---
+
+### Demo runner
+
+```bash
+python demo.py demo/inputs/song.mp3
+```
+
+Runs the full live analysis and saves the timestamped output to `ml-service/generated/`.
+
+---
+
+## Chord Generation — Rule-Based
+
+The rule-based generator works in four steps:
+
+1. **Detect notes per bar** — group melody notes into bars based on BPM
+2. **Build pitch class set** — collect which pitch classes (C, D, E...) appear in each bar
+3. **Score candidate chords** — for each diatonic chord in the key, count overlap with melody notes
+4. **Pick the best fit** — highest overlap score wins
+
+Supports all 12 major and minor keys. Use `--force-key` to bypass auto-detection.
+
+---
+
+## ML Model — Bi-GRU Chord Predictor
+
+The ML model takes 16-bar sequences of melody features and predicts a chord label per bar.
+
+**Architecture:**
+- Input: `(batch, 16, 16)` — pitch class histogram + note density + avg pitch + key offset
+- Projection: Linear(16 → 64)
+- Bi-GRU: 2 layers, hidden size 128, bidirectional
+- Self-attention: query/key projections over GRU output
+- Classifier: Linear → ReLU → Dropout(0.3) → Linear(24 classes)
+- Output: 24 chord classes (12 major + 12 minor)
+
+**Train the model:**
+```bash
+cd ml-service/ml_model
+python train.py
+```
+
+---
+
+## API Output Format
+
+```json
+{
   "success": true,
   "analysis": {
     "notes": [
       {
-        "pitch": 60,           // MIDI note number (C4)
-        "startTime": 0.5,      // Seconds
-        "endTime": 1.0,        // Seconds
-        "duration": 0.5,       // Seconds
-        "velocity": 0.8        // 0-1 (volume)
+        "pitch": 69,
+        "startTime": 0.5,
+        "endTime": 1.0,
+        "duration": 0.5,
+        "velocity": 0.8
       }
     ],
     "noteCount": 47,
-    "key": "C",                // Detected key
-    "scale": "major",          // major/minor
-    "keyConfidence": 0.87,     // 0-1
-    "bpm": 120.5,              // Beats per minute
-    "tempoConfidence": 0.92,   // 0-1
-    "duration": 5.8            // Total seconds
+    "key": "G",
+    "scale": "major",
+    "keyConfidence": 0.85,
+    "bpm": 120.5,
+    "tempoConfidence": 0.92,
+    "duration": 21.8,
+    "chords": [
+      {
+        "name": "G",
+        "root": 67,
+        "midi_notes": [67, 71, 74],
+        "start_time": 0.0,
+        "duration": 1.39,
+        "confidence": 1.0
+      }
+    ],
+    "chordCount": 16,
+    "chordMethod": "rule_based"
   }
 }
+```
 
-🎓 Use Cases
-For Songwriters
+---
 
-Quickly capture melodic ideas on the go
-Generate professional-sounding demos
-Experiment with different chord progressions
-Learn music theory through AI suggestions
+## Troubleshooting
 
-For Music Students
-
-Understand harmony and chord relationships
-Analyze melodies to learn key detection
-Practice ear training with visual feedback
-Study tempo and rhythm patterns
-
-For Content Creators
-
-Create custom background music for videos
-Generate royalty-free musical content
-Produce unique soundtracks quickly
-Customize music to fit your brand
-
-
-🤝 Contributing
-We welcome contributions! This is a final year project, but we're open to improvements.
-How to Contribute
-
-Fork the repository
-Create a feature branch (git checkout -b feature/AmazingFeature)
-Commit your changes (git commit -m 'Add some AmazingFeature')
-Push to the branch (git push origin feature/AmazingFeature)
-Open a Pull Request
-
-Development Guidelines
-
-Follow existing code style
-Write clear commit messages
-Add comments for complex logic
-Test before submitting PR
-
-
-🗺️ Roadmap
-Phase 1: Foundation ✅ (Current)
-
- Audio upload & recording
- Pitch detection (AI)
- Key detection
- Tempo detection
- Piano roll visualization
- Basic UI/UX
-
-Phase 2: Core Features 🔄 (In Progress)
-
- Backend API development
- Chord generation algorithm
- Bass line generation
- Drum pattern integration
- Instrument synthesis
- Basic mixing
-
-Phase 3: Advanced Features ⏳ (Next)
-
- Multiple arrangement styles
- Real-time audio preview
- Advanced mixing console
- User accounts & authentication
- Track library & management
- Collaboration features
-
-Phase 4: Polish & Launch 🚀 (Future)
-
- Mobile responsive design
- PWA support
- Performance optimization
- Cloud deployment
- User testing & feedback
- Public beta launch
-
-
-📈 Performance
-ML Service Benchmarks
-
-Average analysis time: 2-3 seconds per audio file
-Pitch detection accuracy: 92% (Basic-Pitch standard)
-Key detection accuracy: 85-90% (tested on various samples)
-Tempo detection accuracy: 90%+ (tested with metronome tracks)
-
-Supported Formats
-
-Audio Input: MP3, WAV, M4A, FLAC
-Sample Rate: 8kHz - 48kHz (auto-resampled)
-Duration: Up to 5 minutes (recommended)
-File Size: Up to 50MB
-
-
-⚙️ Configuration
-ML Service Environment Variables
-bash# None required - standalone Python script
-# Configurable via command-line arguments
-Frontend Environment Variables
-envNEXT_PUBLIC_API_URL=http://localhost:5000
-NEXT_PUBLIC_SITE_NAME=Beatify
-Backend Environment Variables (Coming Soon)
-envPORT=5000
-DATABASE_URL=sqlite:./beatify.db
-JWT_SECRET=your-secret-key
-UPLOAD_DIR=./uploads
-
-🐛 Troubleshooting
-ML Service Issues
-Issue: ModuleNotFoundError: No module named 'basic_pitch'
-bash# Solution: Reinstall dependencies
+**`ModuleNotFoundError: No module named 'basic_pitch'`**
+```bash
 pip install -r requirements.txt
-Issue: numpy version conflict
-bash# Solution: Install exact versions
+```
+
+**`UnicodeEncodeError` when writing MIDI**
+Ensure track names contain only ASCII characters. This is handled automatically in the current version.
+
+**Backing audio is silent**
+A valid General MIDI soundfont (`.sf2`) is required. Place `GeneralUser.sf2` in `ml-service/` and install fluidsynth via `brew install fluid-synth`.
+
+**Key detection seems wrong**
+Use `--force-key` with the known key. Auto-detection works best when the melody covers 5+ distinct notes. Melodies using only 3–4 notes produce ambiguous pitch class histograms.
+
+**numpy version conflict**
+```bash
 pip install numpy==1.24.3
-Issue: Audio analysis returns empty notes
-bash# Possible causes:
-# - Audio file is too quiet (normalize audio)
-# - File format not supported (convert to WAV)
-# - File is corrupted (try different file)
-Frontend Issues
-Issue: Cannot connect to backend
-bash# Solution: Check if backend is running
-# Verify NEXT_PUBLIC_API_URL in .env.local
+```
 
-📜 License
-This project is licensed under the MIT License - see the LICENSE file for details.
+---
 
-👥 Team
-Final Year Project Team:
+## Tech Stack
 
-Person 1 (Musician + ML Lead) - Audio analysis, AI integration, music theory
-Person 2 (Full-Stack Dev) - Backend API, database, integration
-Person 3 (Project Manager) - Testing, documentation, presentation
+| Layer       | Technology                          |
+|-------------|-------------------------------------|
+| Frontend    | Next.js 14, TypeScript, Tailwind CSS |
+| Backend     | Node.js 18, Express                 |
+| ML Service  | Python 3.11, TensorFlow, PyTorch    |
+| Pitch AI    | Basic-Pitch (Spotify)               |
+| Audio       | Librosa, soundfile, NumPy           |
+| MIDI        | pretty_midi, mido                   |
 
-Institution: [Your University Name]
-Department: Computer Science & Engineering
-Year: 2024-2025
+---
 
-🙏 Acknowledgments
-Open Source Libraries
+## Team
 
-Basic-Pitch by Spotify - Pitch detection
-Librosa - Audio analysis
-Next.js - React framework
-Tailwind CSS - Styling
-shadcn/ui - UI components
+Final Year Project — Computer Science & Engineering, 2024–2025
 
-Research Papers
-
-Basic Pitch: A Universal Music Transcription Tool (Spotify, 2022)
-Music Information Retrieval techniques (ISMIR)
-
-Inspiration
-
-Melodyne by Celemony
-Hookpad by Hooktheory
-Moises.ai
-
-
-📧 Contact
-Project Repository: github.com/MeekaSimson/Beatify
-For Questions/Issues: Open an issue on GitHub
-Email: [Your Email] (for academic/collaboration inquiries)
-
-🌟 Star Us!
-If you find this project interesting or useful, please consider giving it a ⭐ on GitHub!
-
-📸 Screenshots
-Audio Analysis Dashboard
-Show Image
-Piano Roll Visualization
-Show Image
-Mix Console
-Show Image
-(Add screenshots once UI is complete)
-
-🎬 Demo Video
-Show Image
-(Add demo video link once recorded)
-
-Built with ❤️ by Computer Science students passionate about music and AI
+- **Musician + ML Lead** — Audio analysis, music theory, chord generation
+- **Full-Stack Dev** — Frontend, backend API, integration
+- **Project Manager** — Testing, documentation, presentation
