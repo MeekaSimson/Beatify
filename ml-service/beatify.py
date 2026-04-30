@@ -1,16 +1,11 @@
 """
-Beatify Demo
-------------
+Beatify — Voice to Song Generator
+-----------------------------------
 Usage:
-    python demo.py <input_audio>
+    python beatify.py <input_audio>
 
 Example:
-    python demo.py demo/inputs/song1.mp3
-
-What it does:
-  1. Runs real audio analysis  (key, BPM, chord detection)
-  2. Displays the full arrangement that was generated
-  3. Opens the final mixed song output
+    python beatify.py samples/inputs/song1.mp3
 """
 
 import sys
@@ -20,7 +15,6 @@ import time
 import subprocess
 from pathlib import Path
 
-# ── colour helpers ────────────────────────────────────────────────────────────
 GREEN  = "\033[92m"
 CYAN   = "\033[96m"
 YELLOW = "\033[93m"
@@ -36,28 +30,22 @@ def header(text):
 def ok(text):
     print(f"{GREEN}  ✓  {text}{RESET}")
 
-def info(text):
-    print(f"     {text}")
-
 def step(n, text):
     print(f"\n{BOLD}[{n}]  {text}{RESET}")
 
-# ── output lookup ─────────────────────────────────────────────────────────────
-DEMO_DIR = Path(__file__).parent / "demo"
+SAMPLES_DIR = Path(__file__).parent / "samples"
 
 def find_output(stem: str, suffix: str) -> Path | None:
-    path = DEMO_DIR / "outputs" / f"{stem}{suffix}"
+    path = SAMPLES_DIR / "outputs" / f"{stem}{suffix}"
     return path if path.exists() else None
 
-# ── open file with system default app ────────────────────────────────────────
 def open_file(path: Path):
     subprocess.Popen(["open", str(path)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-# ── main ──────────────────────────────────────────────────────────────────────
 def main():
     if len(sys.argv) < 2:
-        print(f"Usage: python demo.py <input_audio>")
-        print(f"Example: python demo.py demo/inputs/song1.mp3")
+        print(f"Usage: python beatify.py <input_audio>")
+        print(f"Example: python beatify.py samples/inputs/song1.mp3")
         sys.exit(1)
 
     audio_path = Path(sys.argv[1])
@@ -70,7 +58,7 @@ def main():
     print(f"\n{BOLD}  🎵  BEATIFY — Voice to Song{RESET}")
     print(f"  Input: {audio_path.name}\n")
 
-    # ── Step 1: Real analysis ─────────────────────────────────────────────────
+    # ── Step 1: Audio Analysis ────────────────────────────────────────────────
     header("STEP 1 — Audio Analysis")
     step(1, "Loading audio and detecting musical features...")
     time.sleep(0.5)
@@ -92,7 +80,7 @@ def main():
     ok(f"Tempo: {analysis['bpm']:.1f} BPM")
     ok(f"Duration: {analysis['duration']:.1f} seconds")
 
-    # ── Step 2: Chord generation (real) ───────────────────────────────────────
+    # ── Step 2: Chord Generation ──────────────────────────────────────────────
     header("STEP 2 — Chord Generation")
     step(2, "Generating diatonic chord progression...")
     time.sleep(0.4)
@@ -120,10 +108,8 @@ def main():
 
     ok(f"Generated {len(chords)} chords  —  key: {key} {scale}")
 
-    # Show chord progression
     print(f"\n  {YELLOW}Chord Progression:{RESET}")
     names = [c.name for c in chords]
-    # Deduplicate consecutive repeated chords for readability
     progression = []
     for name in names:
         if not progression or progression[-1] != name:
@@ -140,7 +126,7 @@ def main():
     if len(chords) > 8:
         print(f"         ... {len(chords) - 8} more bars")
 
-    # ── Step 3: Arrangement ───────────────────────────────────────────────────
+    # ── Step 3: Full Arrangement ──────────────────────────────────────────────
     header("STEP 3 — Full Arrangement")
     step(3, "Building backing track (chords + bass + drums)...")
     time.sleep(0.5)
@@ -148,11 +134,11 @@ def main():
     from bass_generator import BassGenerator
     from drum_generator import DrumGenerator
 
-    bass_gen  = BassGenerator()
-    bass      = bass_gen.generate_bass_line(chords, style="root")
+    bass_gen = BassGenerator()
+    bass     = bass_gen.generate_bass_line(chords, style="root")
 
-    drum_gen  = DrumGenerator()
-    drums     = drum_gen.generate_pattern(
+    drum_gen = DrumGenerator()
+    drums    = drum_gen.generate_pattern(
         bpm=bpm, duration=analysis["duration"], start_offset=0.0, style="standard"
     )
 
@@ -162,10 +148,9 @@ def main():
     midi_out = find_output(stem, "_arrangement.mid")
     song_out = find_output(stem, "_song.wav")
 
-    # If no pre-made MIDI, generate it live from the pipeline
     if not midi_out:
         from midi_exporter import MidiExporter
-        live_midi_path = DEMO_DIR / "outputs" / f"{stem}_arrangement.mid"
+        live_midi_path = SAMPLES_DIR / "outputs" / f"{stem}_arrangement.mid"
         live_midi_path.parent.mkdir(parents=True, exist_ok=True)
 
         exporter = MidiExporter(bpm=bpm, style="standard")
@@ -174,14 +159,11 @@ def main():
         exporter.add_drums(drums)
         exporter.write(str(live_midi_path))
         midi_out = live_midi_path
-        ok(f"Arrangement MIDI generated live: {midi_out.name}")
+        ok(f"Arrangement MIDI generated: {midi_out.name}")
     else:
         ok(f"Arrangement MIDI: {midi_out.name}")
 
-    if song_out:
-        ok(f"Final song:       {song_out.name}")
-
-    # ── Step 4: Generate output into generated/ folder ───────────────────────
+    # ── Step 4: Generating Output ─────────────────────────────────────────────
     header("STEP 4 — Generating Output")
 
     import datetime
@@ -203,7 +185,6 @@ def main():
         from audio_renderer import mix_voice_with_backing
         step(4, "Normalising and exporting final mix...")
         time.sleep(0.5)
-        # Re-process through the audio pipeline to apply normalisation
         mix_voice_with_backing(str(audio_path), str(song_out), str(final_path),
                                voice_gain=0.0, backing_gain=1.0)
 
@@ -215,7 +196,6 @@ def main():
 
     if final_path.exists():
         ok(f"Output saved  →  generated/{final_path.name}")
-        # Reveal the file in Finder so it's visible immediately
         subprocess.Popen(["open", "-R", str(final_path)])
         song_out = final_path
 
